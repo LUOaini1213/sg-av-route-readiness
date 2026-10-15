@@ -20,7 +20,7 @@ jobs:
         run: |
           PYTHONPATH=src python -m avready.build
           git status --porcelain
-          git diff --stat --exit-code
+          python tools/check_rebuild.py
       - name: Mutation check (every mutant must make the suite fail)
         run: python tools/mutation_check.py
       - name: Mutation results unchanged

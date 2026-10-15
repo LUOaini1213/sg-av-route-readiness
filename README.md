@@ -164,7 +164,9 @@ python -m avready.build
 
 CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs the tests and rebuilds
 everything from committed inputs. It fails if any output differs, then runs the mutation
-check.
+check. Two coordinate files are compared to within 1e-6 degrees, because PROJ's last
+decimal differs between Windows and Linux. Everything else must match byte for byte
+([`tools/check_rebuild.py`](tools/check_rebuild.py)).
 
 **The mutation check failed on its first run:** 26 of 29 mutants were killed. The tests
 were fixed, and the run is recorded in
