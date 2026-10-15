@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Tests
+        run: python -m pytest -q
+      - name: Rebuild outputs from committed inputs and check nothing changed
+        run: |
+          PYTHONPATH=src python -m avready.build
+          git status --porcelain
+          git diff --stat --exit-code
+      - name: Mutation check (every mutant must make the suite fail)
+        run: python tools/mutation_check.py
+      - name: Mutation results unchanged
+        run: git diff --exit-code results/mutation.json

@@ -1,0 +1,147 @@
+{
+  "baseline": "passed",
+  "mutants": 28,
+  "killed": 28,
+  "results": [
+    {
+      "file": "common.py",
+      "mutant": "turn sign flipped (left/right swapped)",
+      "status": "killed"
+    },
+    {
+      "file": "common.py",
+      "mutant": "bearing measured from east",
+      "status": "killed"
+    },
+    {
+      "file": "network.py",
+      "mutant": "kerb side taken as the right-hand side",
+      "status": "killed"
+    },
+    {
+      "file": "network.py",
+      "mutant": "loop closure double-counts the first stop edge",
+      "status": "killed"
+    },
+    {
+      "file": "network.py",
+      "mutant": "reversed one-way treated as forward",
+      "status": "killed"
+    },
+    {
+      "file": "profile.py",
+      "mutant": "short tail no longer merged",
+      "status": "killed"
+    },
+    {
+      "file": "profile.py",
+      "mutant": "two-way lanes not split by direction",
+      "status": "killed"
+    },
+    {
+      "file": "profile.py",
+      "mutant": "zebra crossings not counted as uncontrolled",
+      "status": "killed"
+    },
+    {
+      "file": "profile.py",
+      "mutant": "bus stops on the wrong kerb",
+      "status": "killed"
+    },
+    {
+      "file": "profile.py",
+      "mutant": "cluster radius halved",
+      "status": "killed"
+    },
+    {
+      "file": "profile.py",
+      "mutant": "turn labels swapped",
+      "status": "killed"
+    },
+    {
+      "file": "profile.py",
+      "mutant": "signal search radius ignored",
+      "status": "killed"
+    },
+    {
+      "file": "profile.py",
+      "mutant": "road bends counted as junction turns",
+      "status": "killed"
+    },
+    {
+      "file": "risk.py",
+      "mutant": "likelihood thresholds made exclusive",
+      "status": "killed"
+    },
+    {
+      "file": "risk.py",
+      "mutant": "rating thresholds made exclusive",
+      "status": "killed"
+    },
+    {
+      "file": "risk.py",
+      "mutant": "score added instead of multiplied",
+      "status": "killed"
+    },
+    {
+      "file": "speedbands.py",
+      "mutant": "band 8 midpoint not substituted",
+      "status": "killed"
+    },
+    {
+      "file": "speedbands.py",
+      "mutant": "sample instead of population std",
+      "status": "killed"
+    },
+    {
+      "file": "speedbands.py",
+      "mutant": "operating window start excluded",
+      "status": "killed"
+    },
+    {
+      "file": "speedbands.py",
+      "mutant": "public holidays treated as service days",
+      "status": "killed"
+    },
+    {
+      "file": "kpi.py",
+      "mutant": "planned disengagements counted",
+      "status": "killed"
+    },
+    {
+      "file": "kpi.py",
+      "mutant": "on-time window bounds excluded",
+      "status": "killed"
+    },
+    {
+      "file": "kpi.py",
+      "mutant": "manual share over autonomous km only",
+      "status": "killed"
+    },
+    {
+      "file": "kpi.py",
+      "mutant": "availability always 100%",
+      "status": "killed"
+    },
+    {
+      "file": "geocode.py",
+      "mutant": "substring match picks the wrong building",
+      "status": "killed"
+    },
+    {
+      "file": "trace.py",
+      "mutant": "stop markers left in the trace",
+      "status": "killed"
+    },
+    {
+      "file": "trace.py",
+      "mutant": "no road-matching refinement",
+      "status": "killed"
+    },
+    {
+      "file": "network.py",
+      "mutant": "published map ignored when routing",
+      "status": "killed"
+    }
+  ]
+}

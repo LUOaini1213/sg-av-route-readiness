@@ -1,0 +1,3 @@
+file,polled_at,incidents_islandwide
+data/raw/incidents/2026-10-15/inc_20261015_1430.jsonl.gz,2026-10-15T14:30:00,0
+data/raw/incidents/2026-10-15/inc_20261015_1500.jsonl.gz,2026-10-15T15:00:00,19

@@ -1,0 +1,29 @@
+{
+  "PG-R1": {
+    "icp_median_m": 4.080361749736505,
+    "icp_p90_m": 13.243848898297006,
+    "marker_rms_m_initial": 30.652913097534704,
+    "metres_per_pixel": 4.895382801167452,
+    "n_pixels": 5249,
+    "n_points_thinned": 5090,
+    "share_within_15m": 0.9226519337016574
+  },
+  "PG-R2": {
+    "icp_median_m": 5.978795964881883,
+    "icp_p90_m": 31.433904662271356,
+    "marker_rms_m_initial": 67.30560281643146,
+    "metres_per_pixel": 4.8512674204517,
+    "n_pixels": 6803,
+    "n_points_thinned": 6467,
+    "share_within_15m": 0.7392326914596502
+  },
+  "PG-R3": {
+    "icp_median_m": 4.985725405732435,
+    "icp_p90_m": 16.616179487964025,
+    "marker_rms_m_initial": 76.02626853285139,
+    "metres_per_pixel": 4.861858355693649,
+    "n_pixels": 5445,
+    "n_points_thinned": 5226,
+    "share_within_15m": 0.878236914600551
+  }
+}

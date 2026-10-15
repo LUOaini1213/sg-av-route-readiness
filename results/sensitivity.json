@@ -1,0 +1,18 @@
+{
+  "all_routes": {
+    "draws": 500,
+    "spearman_median": 0.96,
+    "spearman_p05": 0.927,
+    "top_n": 10,
+    "top_overlap_median": 0.7,
+    "top_overlap_p05": 0.5
+  },
+  "punggol_shuttles": {
+    "draws": 500,
+    "spearman_median": 0.956,
+    "spearman_p05": 0.921,
+    "top_n": 10,
+    "top_overlap_median": 0.7,
+    "top_overlap_p05": 0.5
+  }
+}

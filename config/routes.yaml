@@ -1,0 +1,151 @@
+# Routes assessed in this repository.
+#
+# Every fact here comes from a public source listed in SOURCES.md (keys in `sources`).
+# Stop *anchors* are OneMap search queries for the HDB blocks or buildings named in the
+# official announcement; the pick-up/drop-off (PUDO) point is placed at the mean of the
+# anchors and then snapped to the nearest drivable road. That snap is a reconstruction,
+# not a surveyed PUDO location.
+
+routes:
+  - id: PG-R1
+    name: "Punggol West to East (Route 1)"
+    kind: shuttle
+    aoi: punggol
+    operator: "Grab, on the WeRide platform"
+    status: "Fixed-route rides open to the public since 2026-04-01; free while revenue service is pending"
+    official_length_km: 10
+    official_duration_min: 35
+    loop: true
+    sources: [lta-2025-09-20, lta-annex-a, lta-2026-03, lta-2026-07]
+    stops:
+      - name: "Punggol Matilda Court Blk 234"
+        note: "PUDO between Blk 234 and Blk 231 (secondary source: ltg-punggol)"
+        anchors: ["234 SUMANG LANE", "231A SUMANG LANE"]
+      - name: "Punggol Clover Blk 204A"
+        note: "PUDO between Blk 204A and Blk 205A (secondary source: ltg-punggol)"
+        anchors: ["204A PUNGGOL FIELD", "205A PUNGGOL FIELD"]
+      - name: "Punggol Plaza"
+        note: "Back-entrance shelter between Punggol Plaza and Blk 171C (secondary source: ltg-punggol)"
+        anchors: ["PUNGGOL PLAZA", "171C EDGEDALE PLAINS"]
+      - name: "Oasis Terraces"
+        anchors: ["681 PUNGGOL DRIVE"]
+
+  - id: PG-R2
+    name: "Punggol East to North (Route 2)"
+    kind: shuttle
+    aoi: punggol
+    operator: "ComfortDelGro, on the Pony.ai platform"
+    status: "By-invite rides from 2026-04-07 and a shorter public variant from 2026-06-22 (secondary source: ltg-punggol)"
+    official_length_km: 12
+    official_duration_min: 55
+    loop: true
+    sources: [lta-2025-09-20, lta-annex-a, lta-2026-03, lta-2026-07, ltg-punggol]
+    stops:
+      - name: "Punggol Plaza"
+        anchors: ["PUNGGOL PLAZA", "171C EDGEDALE PLAINS"]
+      - name: "Punggol Waterway Sunrise I Blk 656A"
+        note: "PUDO between Blk 656A and Blk 655A (secondary source: ltg-punggol)"
+        anchors: ["656A PUNGGOL EAST", "655A PUNGGOL EAST"]
+      - name: "Punggol Waterway Sunrise II Blk 653C"
+        anchors: ["653C PUNGGOL DRIVE"]
+      - name: "One Punggol (Sam Kee LRT)"
+        anchors: ["SAM KEE LRT STATION", "ONE PUNGGOL"]
+      # Not a stop: Annex A draws the route west along Punggol Way between One Punggol and
+      # Northshore; without this point the router cuts through a shorter road. Westmost
+      # point of the drawn curve in data/derived/trace_PG-R2.csv.
+      - name: "shape point: drawn curve on Punggol Way"
+        shape_point: true
+        svy21: [35448, 43716]
+      - name: "Punggol Northshore Blk 420A"
+        anchors: ["420A NORTHSHORE DRIVE"]
+      # Not a stop: the north-east corner of the drawn Northshore loop (same source).
+      - name: "shape point: drawn north-east corner of the Northshore loop"
+        shape_point: true
+        svy21: [36676, 44407]
+      - name: "Punggol Coast Mall (Bus Interchange)"
+        anchors: ["PUNGGOL COAST BUS INTERCHANGE"]
+      # Not a stop. Annex A draws a loop east of Punggol Coast before the route returns
+      # to Oasis Terraces; without this point the router takes the shorter drawn segment
+      # of Punggol Drive, which the map uses in the other direction. Coordinates are the
+      # eastmost point of that drawn loop in data/derived/trace_PG-R2.csv.
+      - name: "shape point: drawn turn east of Punggol Coast"
+        shape_point: true
+        svy21: [36897, 43181]
+      - name: "Oasis Terraces"
+        anchors: ["681 PUNGGOL DRIVE"]
+
+  - id: PG-R3
+    name: "Punggol West to North (Route 3)"
+    kind: shuttle
+    aoi: punggol
+    operator: "Grab, on the WeRide platform"
+    status: "Fixed-route rides open to the public since 2026-04-01; free while revenue service is pending"
+    official_length_km: 12
+    official_duration_min: 40
+    loop: true
+    sources: [lta-2025-09-20, lta-annex-a, lta-2026-03, lta-2026-07]
+    stops:
+      - name: "Punggol Matilda Court Blk 234"
+        anchors: ["234 SUMANG LANE", "231A SUMANG LANE"]
+      - name: "Punggol Clover Blk 204A"
+        anchors: ["204A PUNGGOL FIELD", "205A PUNGGOL FIELD"]
+      - name: "One Punggol (Sam Kee LRT)"
+        anchors: ["SAM KEE LRT STATION", "ONE PUNGGOL"]
+      # Not a stop: Annex A draws the route west along Punggol Way between One Punggol and
+      # Northshore; without this point the router cuts through a shorter road. Westmost
+      # point of the drawn curve in data/derived/trace_PG-R3.csv.
+      - name: "shape point: drawn curve on Punggol Way"
+        shape_point: true
+        svy21: [35448, 43716]
+      - name: "Punggol Northshore Blk 420A"
+        anchors: ["420A NORTHSHORE DRIVE"]
+      - name: "Punggol Coast Mall (Bus Interchange)"
+        anchors: ["PUNGGOL COAST BUS INTERCHANGE"]
+
+  # The two public bus services named for LTA's autonomous bus pilot. In October 2026
+  # LTA said (reply to Lianhe Zaobao, reported 12-13 Oct) that the buses will not be
+  # deployed on these services. They are kept as a comparison of road environments only;
+  # no deployment pack is generated for them.
+  - id: BUS-400
+    name: "Bus service 400 (Marina Bay / Shenton Way loop)"
+    kind: bus_reference
+    aoi: marina
+    operator: "SBS Transit (manned service)"
+    status: "Named for the autonomous bus pilot in Oct 2025; deployment on this service called off (LTA reply reported Oct 2026)"
+    official_length_km: 11.4
+    loop: true
+    datamall_service: "400"
+    sources: [lta-2025-10, ltg-bus-cancel, datamall-busroutes]
+
+  - id: BUS-191
+    name: "Bus service 191 (Buona Vista / one-north loop)"
+    kind: bus_reference
+    aoi: onenorth
+    operator: "SBS Transit (manned service)"
+    status: "Named for the autonomous bus pilot in Oct 2025; deployment on this service called off (LTA reply reported Oct 2026)"
+    official_length_km: 7.5
+    loop: true
+    datamall_service: "191"
+    sources: [lta-2025-10, ltg-bus-cancel, datamall-busroutes]
+
+# Areas the OSM and LTA layers are clipped to (south, west, north, east), WGS84.
+aois:
+  punggol: [1.383, 103.878, 1.428, 103.932]
+  marina: [1.260, 103.838, 1.290, 103.878]
+  onenorth: [1.285, 103.780, 1.316, 103.802]
+
+# Documented incident involving an autonomous shuttle on the Punggol network. Location
+# is described in text only ("service road outside Block 172, Edgedale Plains"), so it
+# is geocoded to that block. See SOURCES.md: mot-2026-02 and ltg-suspend.
+documented_events:
+  - id: EV-2026-01-17
+    date: "2026-01-17"
+    route_hint: PG-R2
+    anchor: "172 EDGEDALE PLAINS"
+    summary: >-
+      An autonomous shuttle on routine mapping (no passengers) detected an object, the
+      safety operator took over manual control, and the vehicle struck a road divider on a
+      service road outside Blk 172 Edgedale Plains. Service was paused for review and
+      resumed on 2026-01-30. LTA and the operator reviewed procedures for transitions
+      between autonomous and manual driving.
+    sources: [mot-2026-02, ltg-suspend]

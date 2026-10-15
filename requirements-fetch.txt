@@ -1,0 +1,4 @@
+# Only for the local fetch steps (LTA shapefiles, Annex A PDF).
+-r requirements.txt
+pyshp==3.1.6
+PyMuPDF==1.28.2

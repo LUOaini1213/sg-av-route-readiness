@@ -1,0 +1,85 @@
+# Thresholds and weights for the segment profile and the risk register.
+# These are judgement calls for a desk assessment, written down so they can be argued
+# with. `results/sensitivity.json` shows how much the ranking moves when they change.
+
+segment_length_m: 250
+
+buffers_m:
+  signal: 20          # OSM traffic_signals node or LTA traffic light within this distance
+  signal_cluster: 40  # lights closer than this are one signal-controlled site
+  crossing_touch: 3   # LTA RoadCrossing / RoadHump line must come this close to the path line
+  crossing_cluster: 25
+  bus_stop: 20        # DataMall bus stop this close to the path AND on its left (kerb) side
+  school_osm: 150     # OSM school/kindergarten/childcare within this distance (proxy only)
+  incident: 60
+  speedband_match: 20
+  junction_signal: 35 # a junction with a signal within this distance counts as signalised
+
+turn_deg: 45          # |heading change| above this at a junction node is a turn
+speedband:
+  bearing_tol_deg: 35
+  slow_band_max: 2    # bands 1-2 = under 20 km/h
+  operating_window: {days: [0, 1, 2, 3, 4, 5], start: "09:30", end: "17:30"}  # Mon-Sat, published hours
+  band8_speed_kmh: 75  # band 8 is "70 and above"; its midpoint is taken as 75
+
+# Hazards scored per segment. likelihood: exposure count -> 1..5 via `bands`
+# (count >= band[i] gives likelihood i+1). severity: 1..5, fixed per hazard type.
+hazards:
+  unprotected_right_turn:
+    label: "Right turn across oncoming traffic at a junction without signals"
+    severity: 4
+    bands: [0.5, 1, 2, 3, 4]
+  signal_controlled_site:
+    label: "Signal-controlled site: junction or signalised crossing (signal recognition, red-light runners, turning conflicts)"
+    severity: 4
+    bands: [0.5, 1, 2, 3, 4]
+  uncontrolled_crossing:
+    label: "Pedestrian crossing without signals (zebra or unmarked)"
+    severity: 5
+    bands: [0.5, 1, 2, 3, 5]
+  signalised_crossing:
+    label: "Signalised pedestrian crossing"
+    severity: 3
+    bands: [0.5, 1, 2, 3, 5]
+  school_zone:
+    label: "LTA School Zone (children, drop-off traffic, 40 km/h at school hours)"
+    severity: 5
+    bands: [1, 50, 100, 175, 250]     # metres of path inside a zone
+  silver_zone:
+    label: "LTA Silver Zone (elderly pedestrians)"
+    severity: 5
+    bands: [1, 50, 100, 175, 250]
+  roundabout:
+    label: "Roundabout (gap acceptance, yielding)"
+    severity: 3
+    bands: [0.5, 1, 2, 3, 4]
+  high_speed_road:
+    label: "Posted limit 60 km/h or more (large speed differential with a slow shuttle)"
+    severity: 4
+    bands: [1, 60, 125, 190, 250]     # metres of path on such roads
+  multi_lane:
+    label: "Three or more lanes in the direction of travel (lane changes, merges)"
+    severity: 3
+    bands: [1, 60, 125, 190, 250]
+  bus_stop_interaction:
+    label: "Public bus stop on the path (buses pulling in/out, pedestrians, occlusion)"
+    severity: 3
+    bands: [0.5, 1, 2, 3, 4]
+  service_road:
+    label: "Service road or car-park access (reversing vehicles, narrow carriageway)"
+    severity: 3
+    bands: [1, 40, 80, 150, 250]
+  speed_variability:
+    label: "Variable traffic speed in operating hours (stop-go, queues; on-time risk)"
+    severity: 2
+    bands: [0.15, 0.25, 0.35, 0.45, 0.6]  # length-weighted CV of speed-band midpoint
+  recorded_incident:
+    label: "Traffic incident recorded nearby (DataMall incident polls or documented AV event)"
+    severity: 4
+    bands: [0.5, 1, 2, 3, 4]
+
+rating_bands:   # score = likelihood x severity
+  - [1, "Low"]
+  - [5, "Medium"]
+  - [10, "High"]
+  - [17, "Very high"]
