@@ -246,8 +246,12 @@ def reconstruct(route: dict, net: Network, use_trace: bool = True) -> dict:
                      + nx.shortest_path_length(net.graph, v, nxt["edge"][0], weight=weight))
             except nx.NetworkXNoPath:
                 continue
-            if best is None or c < best[0]:
-                best = (c, (u, v), dist)
+            # Consecutive edges along the same best path cost the same, so break ties
+            # (to 1 cm, which also absorbs float noise across platforms) by distance to
+            # the shape point, then by node ids.
+            key = (round(c, 2), round(dist, 3), u, v)
+            if best is None or key < best[0]:
+                best = (key, (u, v), dist)
         if best is None:
             raise RuntimeError(f"no edge within {SHAPE_RADIUS} m of {s['name']}")
         s["edge"], s["snap_m"] = list(best[1]), round(best[2], 1)
