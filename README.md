@@ -164,7 +164,7 @@ python -m avready.build
 
 CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs the tests and rebuilds
 everything from committed inputs. It fails if any output differs, then runs the mutation
-check. Two coordinate files are compared to within 1e-6 degrees, because PROJ's last
+check. Two coordinate files are compared to within 2e-6 degrees, because PROJ's last
 decimal differs between Windows and Linux. Everything else must match byte for byte
 ([`tools/check_rebuild.py`](tools/check_rebuild.py)).
 

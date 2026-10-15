@@ -3,7 +3,7 @@
 Text outputs (CSV, Markdown, most JSON) must be byte-identical. Two files hold raw
 coordinates converted through PROJ, whose last decimal can differ between platforms
 (Windows build machine, Linux CI); those are compared numerically with a tolerance of
-1e-6 degrees (about 0.1 m) instead.
+2e-6 degrees (about 0.2 m), i.e. one unit in the last written decimal.
 
     python tools/check_rebuild.py
 """
@@ -15,7 +15,7 @@ import subprocess
 import sys
 
 TOLERANT = {"data/derived/routes.json.gz", "docs/data/segments.geojson"}
-TOL = 1e-6
+TOL = 2e-6  # one unit in the 6th decimal, plus float slack
 
 
 def committed(path: str) -> bytes:
