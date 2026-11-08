@@ -32,11 +32,26 @@ def test_segments_tile_each_route():
 
 
 def test_summary_matches_segments():
+    """Turns are route events assigned to one segment each, so they add up. Point sites
+    (signals, crossings, bus stops) near a segment boundary appear in both segments, so
+    the route counts them once: at most the segment sum, at least the largest segment."""
     segs = rows("segments.csv")
+    val = json.loads((RESULTS / "validation.json").read_text(encoding="utf-8"))["osm_vs_lta"]
     for s in rows("route_summary.csv"):
         mine = [x for x in segs if x["route_id"] == s["route_id"]]
-        for k in ("signal_sites", "right_turns_unsignalised", "crossings_uncontrolled_osm", "bus_stops"):
+        for k in ("right_turns_unsignalised", "right_turns_signalised", "left_turns"):
             assert int(s[k]) == sum(int(x[k]) for x in mine), (s["route_id"], k)
+        for k in ("signal_sites", "crossings_uncontrolled_osm", "crossings_lta", "bus_stops", "roundabouts"):
+            col = [int(x[k]) for x in mine]
+            assert max(col) <= int(s[k]) <= sum(col), (s["route_id"], k)
+        assert int(s["signal_sites"]) == val[s["route_id"]]["signal_sites_union"]
+        assert int(s["crossings_lta"]) == val[s["route_id"]]["crossings_lta"]
+        km = float(s["reconstructed_km"])
+        assert float(s["signal_sites_per_km"]) == pytest.approx(int(s["signal_sites"]) / km, abs=0.01)
+    # The fix is visible in the committed data: boundary junctions exist on every route.
+    for s in rows("route_summary.csv"):
+        mine = [x for x in segs if x["route_id"] == s["route_id"]]
+        assert int(s["signal_sites"]) < sum(int(x["signal_sites"]) for x in mine), s["route_id"]
 
 
 def test_register_rows_are_complete_and_consistent():
@@ -59,10 +74,10 @@ def test_every_route_in_config_has_outputs():
     assert ids == {s["route_id"] for s in rows("route_summary.csv")}
 
 
-@pytest.mark.parametrize("rid", ["PG-R1", "PG-R2"])
+@pytest.mark.parametrize("rid", ["PG-R1", "PG-R2", "PG-R3"])
 def test_reconstruction_from_committed_inputs(rid):
-    """Rebuild a shuttle route from the committed OSM clip and Annex A trace (R2 also uses
-    shape points) and check it against the published length and the traced map."""
+    """Rebuild a shuttle route from the committed OSM clip and Annex A trace (R2 and R3 also
+    use shape points) and check it against the published length and the traced map."""
     from avready import build, network
 
     route = next(r for r in routes_config()["routes"] if r["id"] == rid)

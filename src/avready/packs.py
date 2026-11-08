@@ -14,7 +14,11 @@ def _sum(rows, k):
     return sum((r[k] or 0) for r in rows)
 
 
-def route_summary(item: dict, cfg: dict, rows: list[dict], reg: list[dict], turns: list[dict]) -> dict:
+def route_summary(item: dict, cfg: dict, rows: list[dict], reg: list[dict], turns: list[dict],
+                  sites: dict) -> dict:
+    """Route totals. Point features (signal sites, crossings, bus stops, roundabouts) come
+    from `sites`, which counts a site on a segment boundary once
+    (profile.route_site_totals); summing the per-segment columns would count it twice."""
     km = item["length_m"] / 1000
     ratings = Counter(r["rating"] for r in reg)
     covered = [r for r in rows if r["speed_links_matched"]]
@@ -34,18 +38,18 @@ def route_summary(item: dict, cfg: dict, rows: list[dict], reg: list[dict], turn
         "map_agreement_path": (item["map_agreement"] or {}).get("path_share_within_30m_of_map"),
         "map_agreement_map": (item["map_agreement"] or {}).get("map_share_within_30m_of_path"),
         "segments": len(rows),
-        "signal_sites": _sum(rows, "signal_sites"),
-        "signal_sites_per_km": round(_sum(rows, "signal_sites") / km, 2),
+        "signal_sites": sites["signal_sites"],
+        "signal_sites_per_km": round(sites["signal_sites"] / km, 2),
         "right_turns_unsignalised": _sum(rows, "right_turns_unsignalised"),
         "right_turns_signalised": _sum(rows, "right_turns_signalised"),
         "left_turns": _sum(rows, "left_turns"),
         "u_turns": _sum(rows, "u_turns"),
-        "crossings_uncontrolled_osm": _sum(rows, "crossings_uncontrolled_osm"),
-        "crossings_signalised_osm": _sum(rows, "crossings_signalised_osm"),
-        "crossings_untyped_osm": _sum(rows, "crossings_untyped_osm"),
-        "crossings_lta": _sum(rows, "crossings_lta"),
-        "roundabouts": _sum(rows, "roundabouts"),
-        "bus_stops": _sum(rows, "bus_stops"),
+        "crossings_uncontrolled_osm": sites["crossings_uncontrolled_osm"],
+        "crossings_signalised_osm": sites["crossings_signalised_osm"],
+        "crossings_untyped_osm": sites["crossings_untyped_osm"],
+        "crossings_lta": sites["crossings_lta"],
+        "roundabouts": sites["roundabouts"],
+        "bus_stops": sites["bus_stops"],
         "school_zone_m": round(_sum(rows, "school_zone_m")),
         "school_zones": "; ".join(sorted({z for r in rows for z in r["school_zones"].split("; ") if z})),
         "silver_zone_m": round(_sum(rows, "silver_zone_m")),
@@ -64,19 +68,20 @@ def route_summary(item: dict, cfg: dict, rows: list[dict], reg: list[dict], turn
     }
 
 
-def osm_vs_lta(segments: list[dict]) -> dict:
-    """How far OSM alone would have under- or over-counted, per route, against LTA layers."""
+def osm_vs_lta(segments: list[dict], site_totals: dict) -> dict:
+    """How far OSM alone would have under- or over-counted, per route, against LTA layers.
+    Site counts are distinct sites per route (`site_totals`, see route_summary)."""
     out = {}
     for rid in sorted({s["route_id"] for s in segments}):
         rows = [s for s in segments if s["route_id"] == rid]
-        osm_x = (_sum(rows, "crossings_signalised_osm") + _sum(rows, "crossings_uncontrolled_osm")
-                 + _sum(rows, "crossings_untyped_osm"))
+        t = site_totals[rid]
+        osm_x = t["crossings_signalised_osm"] + t["crossings_uncontrolled_osm"] + t["crossings_untyped_osm"]
         out[rid] = {
-            "signal_sites_osm": _sum(rows, "signal_sites_osm"),
-            "signal_sites_lta": _sum(rows, "signal_sites_lta"),
-            "signal_sites_union": _sum(rows, "signal_sites"),
+            "signal_sites_osm": t["signal_sites_osm"],
+            "signal_sites_lta": t["signal_sites_lta"],
+            "signal_sites_union": t["signal_sites"],
             "crossings_osm": osm_x,
-            "crossings_lta": _sum(rows, "crossings_lta"),
+            "crossings_lta": t["crossings_lta"],
             "segments_with_lta_crossing_but_no_osm_crossing": sum(
                 1 for s in rows if s["crossings_lta"] and not (s["crossings_signalised_osm"] or s["crossings_uncontrolled_osm"]
                                                                or s["crossings_untyped_osm"])),
@@ -154,6 +159,8 @@ def odd_markdown(item: dict, cfg: dict, rows: list[dict], summ: dict, turns: lis
         f"| Speed-band coverage of the path | {summ['speedband_coverage_share']:.0%} | |",
         f"| Speed variability in operating hours (length-weighted CV) | {summ['speed_cv_weighted']} | |",
     ]
+    lines += ["", "Counts of sites, crossings, roundabouts and bus stops are distinct sites along the route: one on a "
+              "segment boundary is counted once, but listed under both segments."]
     lines += ["", "## 4. ODD items to confirm with the AV developer and operator", ""]
     items = [
         ("Maximum operating speed per segment, and behaviour where the posted limit is 60 km/h or more",

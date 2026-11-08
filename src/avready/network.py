@@ -1,10 +1,14 @@
 """Road graph from the clipped OSM data and route reconstruction.
 
-Route geometry is not published as data. It is rebuilt here as the shortest drivable
-path through the announced stops, in order, closing the loop. The reconstruction is
-checked against the published round-trip length (see `validation` in the outputs), and
-the README reports the gap. Where the gap is large, the reconstruction is not the
-operated path and every per-segment result should be read with that in mind.
+Route geometry is not published as data. It is rebuilt here as the cheapest drivable
+path through the announced stops (and any shape points), in order, closing the loop.
+Where a route line traced from LTA's Annex A map exists (`trace.py`), edges away from it
+cost up to OFF_TRACE_PENALTY times their length ("map-guided"); without a trace, or with
+`use_trace=False`, this is the plain shortest path ("shortest"), which the build also
+reports as a baseline. Each reconstruction is checked against the published round-trip
+length and the traced map (see `validation` in the outputs), and the README reports both.
+Where agreement is low, the reconstruction may not be the operated path and every
+per-segment result should be read with that in mind.
 """
 from __future__ import annotations
 

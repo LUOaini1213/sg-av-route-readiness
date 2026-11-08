@@ -1,9 +1,12 @@
 """Speed-band variability on the links along each route (local step; needs raw snapshots).
 
 Input: LTA DataMall Traffic Speed Bands v4 snapshots (`sb_YYYYMMDD_HHMM.csv.gz`, SGT in
-the name; columns LinkID, SpeedBand, MinimumSpeed, MaximumSpeed) from the candidate's
-sg-bus-network-monitor collector (laptop archive and the public `data-collect` branch),
-plus the link geometry file. Snapshots are read, never modified.
+the name; columns LinkID, SpeedBand, MinimumSpeed, MaximumSpeed) from the author's
+sg-bus-network-monitor collector: 26 Sep - 3 Oct 2026 from a private laptop archive, and
+from 15 Oct 2026 on the public `data-collect` branch. `--links` is the link geometry
+table (LinkID, RoadName, RoadCategory, StartLon, StartLat, EndLon, EndLat), published on
+that branch as `data/raw/speedbands/links/speedband_links.csv.gz`. Snapshots are read,
+never modified.
 
 Output (committed): `data/derived/speedband_stats.csv` for links within 40 m of a route,
 and `data/derived/speedband_manifest.csv` listing every snapshot used.

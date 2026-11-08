@@ -1,7 +1,7 @@
 {
   "baseline": "passed",
-  "mutants": 28,
-  "killed": 28,
+  "mutants": 29,
+  "killed": 29,
   "results": [
     {
       "file": "common.py",
@@ -141,6 +141,11 @@
     {
       "file": "network.py",
       "mutant": "published map ignored when routing",
+      "status": "killed"
+    },
+    {
+      "file": "profile.py",
+      "mutant": "sites on a segment boundary counted twice in route totals",
       "status": "killed"
     }
   ]
