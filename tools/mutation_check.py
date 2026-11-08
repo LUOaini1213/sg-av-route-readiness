@@ -74,6 +74,9 @@ MUTANTS = [
      "no road-matching refinement"),
     ("network.py", "        w[(u, v)] = d[\"weight\"] * (1.0 + (OFF_TRACE_PENALTY - 1.0) * min(1.0, excess / TRACE_RAMP))",
      "        w[(u, v)] = d[\"weight\"]", "published map ignored when routing"),
+    ("profile.py", "                if same:\n                    parent[find((k, i))] = find((k + 1, j))",
+     "                if False:\n                    parent[find((k, i))] = find((k + 1, j))",
+     "sites on a segment boundary counted twice in route totals"),
 ]
 
 

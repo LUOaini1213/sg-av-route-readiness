@@ -11,6 +11,14 @@ data from them. Route paths are reconstructed from LTA's published maps, not sur
 The checklists and register are designed for use in a trial; none of them has been used
 on a real deployment.
 
+**In short.** Three shuttle routes are rebuilt from LTA's route maps (within 5.5% of the
+published lengths) and profiled in 250 m segments into a 459-row risk register. The
+published routes are 7-27% longer than shortest paths through the same stops; every
+shuttle right turn is at a signal; each route has 1.1-1.7 km on roads posted 60 km/h or
+more; OSM alone finds 22-29 signal-controlled sites per route where LTA's layer finds
+32-41. Limits: paths are reconstructed, not surveyed; speed variability rests on 67
+snapshots from five weekdays; severities are uncalibrated desk judgements.
+
 Map: https://luoaini1213.github.io/sg-av-route-readiness/ (segments coloured by risk score).
 
 ## Routes assessed
@@ -20,7 +28,7 @@ Map: https://luoaini1213.github.io/sg-av-route-readiness/ (segments coloured by 
 | PG-R1 | Punggol West to East, ~10 km round trip, ~35 min | Grab (WeRide) | Public rides since 1 Apr 2026 |
 | PG-R2 | Punggol East to North, ~12 km, ~55 min | ComfortDelGro (Pony.ai) | By-invite, then a shorter public variant (secondary source) |
 | PG-R3 | Punggol West to North, ~12 km, ~40 min | Grab (WeRide) | Public rides since 1 Apr 2026 |
-| BUS-400, BUS-191 | Public bus services named for LTA's autonomous bus pilot | SBS Transit (manned) | LTA said in Oct 2026 the pilot will not proceed on these services; kept as a comparison only, no pack |
+| BUS-400, BUS-191 | Public bus services named for LTA's autonomous bus pilot | SBS Transit (manned) | Pilot on these services called off in Oct 2026, per LTA's reply to Lianhe Zaobao as reported by Land Transport Guru and Mothership (secondary sources; no LTA page found); kept as a comparison only, no pack |
 
 **Tengah:** no published route was found. LTA's Sep 2025 release names Tengah only as a
 town where similar shuttles may follow, so nothing in Tengah is assessed.
@@ -34,9 +42,10 @@ town where similar shuttles may follow, so nothing in Tengah is assessed.
    Way (3 lanes, 60 km/h), which the shortest path skips.
 2. **All right turns on the three shuttle routes are at signal-controlled junctions.**
    The reconstructed paths have 7, 8 and 13 right turns at signals and none without
-   (BUS-400 and BUS-191 each have one without). At 4 of these turns OSM tags a signal
-   but LTA's traffic-light layer shows none within 35 m. The ODD checklists list them
-   for a site check.
+   (BUS-400 and BUS-191 each have one without). At 2 of these right-turn junctions (3
+   turns, as Routes 1 and 3 share one) and at 2 signalised left turns, OSM tags a signal
+   but LTA's traffic-light layer shows none within 35 m. The ODD checklists list these 4
+   locations for a site check.
 3. **Each shuttle route spends 1.1-1.7 km on roads posted 60 km/h or more**
    (Punggol North Avenue, Punggol East, Punggol Road, Punggol Way). From the published
    lengths and durations, the shuttles average 13-18 km/h including stops. These
@@ -45,11 +54,12 @@ town where similar shuttles may follow, so nothing in Tengah is assessed.
    Punggol Green Primary). Routes 2 and 3 have about 480 m each. There are no Silver Zones
    on any shuttle route.
 5. **OSM alone is not enough for a deployment survey.** OSM signal nodes on the path
-   find 22-32 signal-controlled sites per shuttle route. LTA's traffic-light layer finds
-   41-58. OSM also has 14-20 crossings per route with no crossing type.
+   find 22-29 signal-controlled sites per shuttle route. LTA's traffic-light layer finds
+   32-41. OSM also has 12-20 crossings per route with no crossing type. Route totals
+   count each site once, including one on a segment boundary (see Method).
 6. **Speed variability in operating hours is moderate.** The length-weighted CV of
    speed-band speed is 0.17-0.19 on the shuttle routes, against 0.27 on BUS-191 and
-   0.13 on BUS-400. This rests on 67 snapshots from four weekdays and should be read as
+   0.13 on BUS-400. This rests on 67 snapshots from five weekdays and should be read as
    indicative.
 7. **Incident history is thin.** Singapore publishes no historical geolocated crash data,
    and the DataMall incident feed is live only. The two polls archived so far (one of
@@ -64,11 +74,11 @@ town where similar shuttles may follow, so nothing in Tengah is assessed.
 
 | Route | km (published) | Signal sites /km | Right turns at signals / without | Crossings without signals (OSM) | School zone m | 60+ km/h m | Bus stops on kerb | Register rows (very high / high) |
 |---|---|---|---|---|---|---|---|---|
-| PG-R1 | 10.41 (10) | 4.5 | 7 / 0 | 7 | 952 | 1,088 | 20 | 150 (4 / 33) |
-| PG-R2 | 11.34 (12) | 3.9 | 8 / 0 | 5 | 472 | 1,535 | 19 | 142 (3 / 31) |
-| PG-R3 | 11.35 (12) | 5.6 | 13 / 0 | 6 | 481 | 1,675 | 22 | 167 (5 / 46) |
-| BUS-400 | 11.66 (11.4) | 5.4 | 7 / 1 | 5 | 0 | 977 | 28 | comparison only |
-| BUS-191 | 8.17 (7.5) | 4.0 | 3 / 1 | 7 | 646 | 2,150 | 22 | comparison only |
+| PG-R1 | 10.41 (10) | 3.5 | 7 / 0 | 7 | 952 | 1,088 | 18 | 150 (4 / 33) |
+| PG-R2 | 11.34 (12) | 3.1 | 8 / 0 | 4 | 472 | 1,535 | 19 | 142 (3 / 31) |
+| PG-R3 | 11.35 (12) | 4.0 | 13 / 0 | 5 | 481 | 1,675 | 19 | 167 (5 / 46) |
+| BUS-400 | 11.66 (11.4) | 4.1 | 7 / 1 | 4 | 0 | 977 | 24 | comparison only |
+| BUS-191 | 8.17 (7.5) | 3.1 | 3 / 1 | 6 | 646 | 2,150 | 20 | comparison only |
 
 Full table: [`outputs/route_summary.csv`](outputs/route_summary.csv). Per segment:
 [`outputs/segments.csv`](outputs/segments.csv). Turns: [`outputs/turns.csv`](outputs/turns.csv).
@@ -116,6 +126,11 @@ within +2.3% and +8.9% of DataMall's.
   cross oncoming traffic.
 - Speed bands are matched by distance and direction, and use only snapshots inside the
   published operating hours (09:30-17:30, Monday to Saturday).
+- A junction on a segment boundary is within the search distance of both segments, so
+  the register counts it as exposure in each. Route totals (the table above, the ODD
+  checklists, `results/validation.json`) count it once: clusters in neighbouring
+  segments that share a light, node or stop, or lie closer than the cluster radius, are
+  one site. A site passed again later on the route counts again.
 
 **Scoring.** For each hazard, likelihood is the number of exposure thresholds met (1-5).
 Severity is fixed per hazard. The score is likelihood x severity on a 5x5 matrix. All
@@ -128,8 +143,11 @@ judgement calls, so the sensitivity run in finding 8 tests them.
   map agreement is lower (Route 2), and verify every item on site.
 - LTA is moving Routes 1 and 3 towards on-demand, direct routing between pick-up points
   (Jul 2026 release). The fixed loops assessed here may not be what runs later.
-- Speed bands cover only 67 snapshots on four weekdays (28 Sep - 2 Oct, plus 15 Oct). No
-  Saturday falls in the operating window sample.
+- Speed bands cover only 67 snapshots on five weekdays (28-29 Sep, 1-2 Oct and 15 Oct).
+  No Saturday falls in the operating window sample. The 65 snapshots up to 3 Oct come from
+  a private laptop archive and are not published; their SHA-256s are in
+  `data/derived/speedband_manifest.csv`. Only the 15 Oct ones are on the public
+  `data-collect` branch, so finding 6 cannot be re-derived from public files alone.
 - OSM posted-speed tags cover 88-97% of the shuttle paths. Untagged does not mean
   unrestricted.
 - Severity and likelihood are desk judgements and have not been calibrated against
@@ -137,17 +155,20 @@ judgement calls, so the sensitivity run in finding 8 tests them.
 
 ## Run it
 
-Python 3.11.
+Python 3.11 (CI runs it on Linux and Windows).
 
 ```bash
 pip install -r requirements.txt
-PYTHONPATH=src python -m avready.build      # committed inputs -> outputs/, docs/, results/
-python -m pytest -q                         # 36 tests
-python tools/mutation_check.py              # 28 deliberate bugs; each must make the suite fail
+pip install --no-deps -e .                  # makes `avready` importable (or set PYTHONPATH=src)
+python -m avready.build                     # committed inputs -> outputs/, docs/, results/
+python tools/check_rebuild.py               # rebuilt outputs must match the committed ones
+python -m pytest -q                         # 53 tests
+python tools/mutation_check.py              # 29 deliberate bugs; each must make the suite fail
 ```
 
 The fetch steps need network access. The DataMall steps also need a key in `LTA_KEY`,
-which is never written to disk. Their outputs are committed, so the build runs offline:
+which is never written to disk. Their outputs are committed, so the build runs offline.
+With `avready` installed as above:
 
 ```bash
 pip install -r requirements-fetch.txt
@@ -157,10 +178,16 @@ python -m avready.fetch_lta geo                             # DataMall geospatia
 python -m avready.fetch_lta bus DIR_WITH_BusRoutes_json     # bus 400/191 stop sequences
 python -m avready.trace 250920-AV-shuttle-punggol.pdf       # Annex A route lines
 python -m avready.build routes
-python -m avready.speedbands --links speedband_links.csv.gz SNAPSHOT_DIR [...]
+python -m avready.speedbands --links speedband_links.csv.gz SNAPSHOT_DIR [...]  # see below
 python -m avready.incidents                                 # data-collect incident polls
 python -m avready.build
 ```
+
+The speed-band link geometry (`speedband_links.csv.gz`) and the snapshots from 15 Oct
+2026 on are on the `data-collect` branch of
+[sg-bus-network-monitor](https://github.com/LUOaini1213/sg-bus-network-monitor/tree/data-collect/data/raw/speedbands)
+(`data/raw/speedbands/links/` and `data/raw/speedbands/YYYY-MM-DD/`). The earlier
+snapshots are not published (see Limitations).
 
 CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs the tests and rebuilds
 everything from committed inputs. It fails if any output differs, then runs the mutation
@@ -171,7 +198,9 @@ decimal differs between Windows and Linux. Everything else must match byte for b
 **The mutation check failed on its first run:** 26 of 29 mutants were killed. The tests
 were fixed, and the run is recorded in
 [`results/mutation_first_run.md`](results/mutation_first_run.md). The current run kills
-28 of 28 ([`results/mutation.json`](results/mutation.json)).
+29 of 29 ([`results/mutation.json`](results/mutation.json)), including one that brings
+back the double count of boundary sites. `tests/test_readme.py` checks the numbers in
+this README against the committed outputs.
 
 ## Licence
 

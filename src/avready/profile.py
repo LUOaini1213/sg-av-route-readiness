@@ -20,7 +20,8 @@ def path_edges(path: list[int], net: Network) -> list[dict]:
     out = []
     for u, v in zip(path[:-1], path[1:]):
         d = net.graph.edges[u, v]
-        out.append({"u": u, "v": v, "length": d["length"], "highway": d["highway"], "tags": ways[d["way"]]})
+        out.append({"u": u, "v": v, "length": d["length"], "highway": d["highway"], "way": d["way"],
+                    "tags": ways[d["way"]]})
     return out
 
 
@@ -177,14 +178,14 @@ def left_of(line: LineString, p: Point) -> bool:
     return (b.x - a.x) * (p.y - a.y) - (b.y - a.y) * (p.x - a.x) > 0
 
 
-def cluster_count(points: list[Point], radius: float) -> int:
-    """Number of groups when points closer than `radius` are chained together."""
+def cluster_groups(points: list[Point], radius: float) -> list[list[int]]:
+    """Indices of `points` grouped so that points closer than `radius` are chained together."""
     pts = [(p.x, p.y) for p in points]
-    seen, groups = set(), 0
+    seen, groups = set(), []
     for i in range(len(pts)):
         if i in seen:
             continue
-        groups += 1
+        group = [i]
         stack = [i]
         seen.add(i)
         while stack:
@@ -193,7 +194,68 @@ def cluster_count(points: list[Point], radius: float) -> int:
                 if j not in seen and math.dist(pts[k], pts[j]) < radius:
                     seen.add(j)
                     stack.append(j)
+                    group.append(j)
+        groups.append(sorted(group))
     return groups
+
+
+def cluster_count(points: list[Point], radius: float) -> int:
+    """Number of groups when points closer than `radius` are chained together."""
+    return len(cluster_groups(points, radius))
+
+
+def site_clusters(items: list[tuple[object, Point]], radius: float) -> dict:
+    """Clusters of identified items in one segment, kept so that route totals can be
+    counted once across segment boundaries (see `route_site_count`)."""
+    groups = cluster_groups([p for _, p in items], radius) if radius > 0 else [[i] for i in range(len(items))]
+    return {"radius": radius,
+            "clusters": [(frozenset(items[i][0] for i in g), [(items[i][1].x, items[i][1].y) for i in g])
+                         for g in groups]}
+
+
+def route_site_count(per_segment: list[dict]) -> int:
+    """Distinct sites along a route from the per-segment clusters, in path order.
+
+    A segment's line runs from its first to its last node, so the boundary node and
+    anything within the search buffer of it belong to both neighbouring segments. A
+    cluster in segment k and one in segment k+1 are the same site when they share an
+    item (the same OSM node, LTA light, crossing or bus stop) or when any of their points
+    are closer than the cluster radius. A site met again later on the route, in a
+    non-adjacent segment (a second pass), is counted again, as the vehicle passes it again.
+    """
+    nodes = [(k, c) for k, seg in enumerate(per_segment) for c in range(len(seg["clusters"]))]
+    parent = {n: n for n in nodes}
+
+    def find(n):
+        while parent[n] != n:
+            parent[n] = parent[parent[n]]
+            n = parent[n]
+        return n
+
+    for k in range(len(per_segment) - 1):
+        a, b = per_segment[k], per_segment[k + 1]
+        radius = a["radius"]
+        for i, (ka, pa) in enumerate(a["clusters"]):
+            for j, (kb, pb) in enumerate(b["clusters"]):
+                same = bool(ka & kb) or (radius > 0 and any(math.dist(x, y) < radius for x in pa for y in pb))
+                if same:
+                    parent[find((k, i))] = find((k + 1, j))
+    return len({find(n) for n in nodes})
+
+
+SITE_KEYS = ("signal_sites_osm", "signal_sites_lta", "signal_sites", "crossings_signalised_osm",
+             "crossings_uncontrolled_osm", "crossings_untyped_osm", "crossings_lta", "bus_stops")
+
+
+def route_site_totals(per_segment_sites: list[dict]) -> dict:
+    """Route-level counts of distinct sites, from each segment's `_sites` in path order.
+
+    Per-segment counts stay as they are (a junction on a boundary is exposure for both
+    segments in the register); these totals count it once."""
+    out = {k: route_site_count([s[k] for s in per_segment_sites]) for k in SITE_KEYS}
+    out["roundabouts"] = (route_site_count([s["roundabout_ways"] for s in per_segment_sites])
+                          + route_site_count([s["mini_roundabouts"] for s in per_segment_sites]))
+    return out
 
 
 # ---------------------------------------------------------------- per-segment features
@@ -211,18 +273,28 @@ def segment_features(seg: list[dict], net: Network, layers: Layers, cfg: dict, r
     path_nodes = [seg[0]["u"]] + [e["v"] for e in seg]
     # OSM signal and crossing nodes count only when they are vertices of the path itself,
     # i.e. the vehicle drives over them; nodes on side roads are not on the route.
-    on_path = [(Point(net.xy[n]), layers.osm_node_tags[n]) for n in path_nodes if n in layers.osm_node_tags]
-    sig_osm = [p for p, t in on_path if t.get("highway") == "traffic_signals"]
-    sig_lta = near(layers.lta_lights, B["signal"])
+    # Items carry an identity (OSM node id or layer index) so that route totals can count
+    # a site on a segment boundary once; see route_site_count.
+    on_path = [(("osm", n), Point(net.xy[n]), layers.osm_node_tags[n]) for n in dict.fromkeys(path_nodes)
+               if n in layers.osm_node_tags]
+    sig_osm_i = [(i, p) for i, p, t in on_path if t.get("highway") == "traffic_signals"]
+    sig_lta_i = [(("lta", j), p) for j, p in enumerate(layers.lta_lights) if line.distance(p) <= B["signal"]]
+    sig_osm = [p for _, p in sig_osm_i]
+    sig_lta = [p for _, p in sig_lta_i]
     signal_pts = sig_osm + sig_lta
-    kinds = [(p, crossing_kind(t)) for p, t in on_path]
-    cross_sig = [p for p, k in kinds if k == "signalised"]
-    cross_unc = [p for p, k in kinds if k == "uncontrolled"]
-    cross_unt = [p for p, k in kinds if k == "untyped"]
+    kinds = [(i, p, crossing_kind(t)) for i, p, t in on_path]
+    cross_i = {k: [(i, p) for i, p, kk in kinds if kk == k] for k in ("signalised", "uncontrolled", "untyped")}
+    cross_sig = [p for _, p in cross_i["signalised"]]
+    cross_unc = [p for _, p in cross_i["uncontrolled"]]
+    cross_unt = [p for _, p in cross_i["untyped"]]
     # LTA crossings are drawn across the carriageway, so they must touch the path line.
-    lta_cross = [ln for ln in layers.lta_crossings if line.distance(ln) <= B["crossing_touch"]]
+    lta_cross_i = [(("ltax", j), ln) for j, ln in enumerate(layers.lta_crossings)
+                   if line.distance(ln) <= B["crossing_touch"]]
+    lta_cross = [ln for _, ln in lta_cross_i]
     humps = [ln for ln in layers.lta_humps if line.distance(ln) <= B["crossing_touch"]]
-    stops = [p for p, _ in layers.bus_stops if line.distance(p) <= B["bus_stop"] and left_of(line, p)]
+    stops_i = [(("stop", code), p) for p, code in layers.bus_stops
+               if line.distance(p) <= B["bus_stop"] and left_of(line, p)]
+    stops = [p for _, p in stops_i]
     schools_osm = [n for p, n in layers.osm_schools if line.distance(p) <= B["school_osm"]]
     sz = [(pg, n) for pg, n in layers.school_zones if line.intersects(pg)]
     slz = [(pg, n) for pg, n in layers.silver_zones if line.intersects(pg)]
@@ -235,8 +307,11 @@ def segment_features(seg: list[dict], net: Network, layers: Layers, cfg: dict, r
     left = sum(1 for t in turns if t["kind"] == "left")
     uturns = sum(1 for t in turns if t["kind"] == "u_turn")
 
-    roundabout_ways = {id(e["tags"]) for e in seg if e["tags"].get("junction") in ("roundabout", "circular")}
-    mini = near(layers.osm_mini_roundabouts, B["signal"])
+    roundabout_i = {("way", e["way"]): Point(net.xy[e["u"]]) for e in seg
+                    if e["tags"].get("junction") in ("roundabout", "circular")}
+    roundabout_ways = set(roundabout_i)
+    mini_i = [(("mini", j), p) for j, p in enumerate(layers.osm_mini_roundabouts) if line.distance(p) <= B["signal"]]
+    mini = [p for _, p in mini_i]
 
     hi_speed = sum(e["length"] for e in seg if (posted_speed(e["tags"]) or 0) >= 60)
     multi = sum(e["length"] for e in seg if (direction_lanes(e["tags"]) or 0) >= 3)
@@ -314,6 +389,19 @@ def segment_features(seg: list[dict], net: Network, layers: Layers, cfg: dict, r
         "speed_p_slow": None if math.isnan(p_slow) else round(p_slow, 3),
         "mid_lat_lon": None,  # filled by caller
         "_mid_xy": (mid.x, mid.y),
+        "_sites": {
+            "signal_sites_osm": site_clusters(sig_osm_i, B["signal_cluster"]),
+            "signal_sites_lta": site_clusters(sig_lta_i, B["signal_cluster"]),
+            "signal_sites": site_clusters(sig_osm_i + sig_lta_i, B["signal_cluster"]),
+            "crossings_signalised_osm": site_clusters(cross_i["signalised"], B["crossing_cluster"]),
+            "crossings_uncontrolled_osm": site_clusters(cross_i["uncontrolled"], B["crossing_cluster"]),
+            "crossings_untyped_osm": site_clusters(cross_i["untyped"], B["crossing_cluster"]),
+            "crossings_lta": site_clusters([(i, ln.interpolate(0.5, normalized=True)) for i, ln in lta_cross_i],
+                                           B["crossing_cluster"]),
+            "bus_stops": site_clusters(stops_i, 0),
+            "roundabout_ways": site_clusters(list(roundabout_i.items()), 0),
+            "mini_roundabouts": site_clusters(mini_i, B["signal_cluster"]),
+        },
         "_xy": xy,
     }
 

@@ -74,7 +74,7 @@ def stage_profile(routes: dict) -> None:
     sc = scoring_config()
     nets, layers_cache, junc_cache = {}, {}, {}
     all_segments, register, summaries, turns_out = [], [], [], []
-    seg_features_by_route = {}
+    seg_features_by_route, site_totals = {}, {}
     for item in routes["routes"]:
         key = (item["aoi"], item["kind"])
         if key not in nets:
@@ -95,7 +95,7 @@ def stage_profile(routes: dict) -> None:
                               "lon": round(lon, 6), "angle_deg": t["angle"],
                               "turn": t["kind"], "signalised": int(t["signalised"]), "signal_source": t["signal_source"],
                               "service_road_access": int(t["access"])})
-        start, idx, rows = 0.0, 0, []
+        start, idx, rows, sites = 0.0, 0, [], []
         for k, seg in enumerate(segs):
             n_edges = len(seg)
             seg_turns = [t for t in turns if idx < t["i"] <= idx + n_edges]
@@ -103,6 +103,7 @@ def stage_profile(routes: dict) -> None:
             idx += n_edges
             mid = to_latlon(*f.pop("_mid_xy"))
             xy = f.pop("_xy")
+            sites.append(f.pop("_sites"))
             f["mid_lat_lon"] = f"{mid[0]:.6f},{mid[1]:.6f}"
             row = {"route_id": item["id"], "segment_id": f'{item["id"]}-S{k + 1:02d}',
                    "start_m": round(start, 1), "end_m": round(start + f["length_m"], 1), **f}
@@ -119,7 +120,8 @@ def stage_profile(routes: dict) -> None:
             register += reg
         seg_features_by_route[item["id"]] = rows
         all_segments += rows
-        summaries.append(packs.route_summary(item, cfg_r[item["id"]], rows, reg, turns))
+        site_totals[item["id"]] = profile.route_site_totals(sites)
+        summaries.append(packs.route_summary(item, cfg_r[item["id"]], rows, reg, turns, site_totals[item["id"]]))
 
     seg_fields = [k for k in all_segments[0] if not k.startswith("_")]
     OUTPUTS.mkdir(exist_ok=True)
@@ -149,7 +151,7 @@ def stage_profile(routes: dict) -> None:
                              for r in routes["routes"]},
                   "stop_snap_m": {r["id"]: [s["snap_m"] for s in r["stops"] if not s["shape_point"]]
                                   for r in routes["routes"]},
-                  "osm_vs_lta": packs.osm_vs_lta(all_segments)}
+                  "osm_vs_lta": packs.osm_vs_lta(all_segments, site_totals)}
     (RESULTS / "validation.json").write_text(json.dumps(validation, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     packs.write_packs(routes, cfg_r, seg_features_by_route, register, summaries, turns_out, sens)

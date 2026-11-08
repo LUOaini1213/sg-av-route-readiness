@@ -1,49 +1,49 @@
 {
   "osm_vs_lta": {
     "BUS-191": {
-      "crossings_lta": 35,
-      "crossings_osm": 47,
+      "crossings_lta": 32,
+      "crossings_osm": 43,
       "segments_with_lta_crossing_but_no_osm_crossing": 0,
       "segments_with_osm_crossing_but_no_lta_crossing": 3,
-      "signal_sites_lta": 33,
-      "signal_sites_osm": 22,
-      "signal_sites_union": 33
+      "signal_sites_lta": 25,
+      "signal_sites_osm": 20,
+      "signal_sites_union": 25
     },
     "BUS-400": {
-      "crossings_lta": 62,
-      "crossings_osm": 78,
+      "crossings_lta": 57,
+      "crossings_osm": 66,
       "segments_with_lta_crossing_but_no_osm_crossing": 0,
       "segments_with_osm_crossing_but_no_lta_crossing": 3,
-      "signal_sites_lta": 58,
-      "signal_sites_osm": 40,
-      "signal_sites_union": 63
+      "signal_sites_lta": 45,
+      "signal_sites_osm": 35,
+      "signal_sites_union": 48
     },
     "PG-R1": {
-      "crossings_lta": 47,
-      "crossings_osm": 61,
+      "crossings_lta": 40,
+      "crossings_osm": 54,
       "segments_with_lta_crossing_but_no_osm_crossing": 0,
       "segments_with_osm_crossing_but_no_lta_crossing": 5,
-      "signal_sites_lta": 45,
+      "signal_sites_lta": 34,
       "signal_sites_osm": 23,
-      "signal_sites_union": 47
+      "signal_sites_union": 36
     },
     "PG-R2": {
-      "crossings_lta": 39,
-      "crossings_osm": 61,
+      "crossings_lta": 35,
+      "crossings_osm": 54,
       "segments_with_lta_crossing_but_no_osm_crossing": 0,
       "segments_with_osm_crossing_but_no_lta_crossing": 7,
-      "signal_sites_lta": 41,
+      "signal_sites_lta": 32,
       "signal_sites_osm": 22,
-      "signal_sites_union": 44
+      "signal_sites_union": 35
     },
     "PG-R3": {
-      "crossings_lta": 54,
-      "crossings_osm": 77,
+      "crossings_lta": 46,
+      "crossings_osm": 67,
       "segments_with_lta_crossing_but_no_osm_crossing": 0,
       "segments_with_osm_crossing_but_no_lta_crossing": 8,
-      "signal_sites_lta": 58,
-      "signal_sites_osm": 32,
-      "signal_sites_union": 63
+      "signal_sites_lta": 41,
+      "signal_sites_osm": 29,
+      "signal_sites_union": 45
     }
   },
   "routes": {
